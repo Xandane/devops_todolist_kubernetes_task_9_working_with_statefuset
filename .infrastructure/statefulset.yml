@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: mysql
+
   template:
     metadata:
       labels:
@@ -17,17 +18,21 @@ spec:
       containers:
         - name: mysql
           image: mysql:8.0
+
           envFrom:
             - secretRef:
                 name: mysql-secret
+
           ports:
             - containerPort: 3306
               name: mysql
+
           volumeMounts:
             - name: mysql-data
               mountPath: /var/lib/mysql
             - name: init-sql
               mountPath: /docker-entrypoint-initdb.d
+
           livenessProbe:
             exec:
               command:
@@ -37,6 +42,7 @@ spec:
                 - localhost
             initialDelaySeconds: 30
             periodSeconds: 10
+
           readinessProbe:
             exec:
               command:
@@ -45,6 +51,7 @@ spec:
                 - SELECT 1
             initialDelaySeconds: 5
             periodSeconds: 5
+
           resources:
             requests:
               cpu: 500m
@@ -52,11 +59,18 @@ spec:
             limits:
               cpu: 1000m
               memory: 1Gi
+
+      volumes:
+        - name: init-sql
+          configMap:
+            name: init-sql-configmap
+
   volumeClaimTemplates:
     - metadata:
         name: mysql-data
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes:
+          - ReadWriteOnce
         resources:
           requests:
             storage: 5Gi
