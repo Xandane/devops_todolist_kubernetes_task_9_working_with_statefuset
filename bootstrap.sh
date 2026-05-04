@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+
+kind create cluster --config .infrastructure/cluster.yml 
 # Create namespace
 kubectl create namespace mysql --dry-run=client -o yaml | kubectl apply -f -
 # Apply secret
